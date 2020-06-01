@@ -98,3 +98,8 @@ MonoBehaviour:
       TriggerMode: 0
       TriggerTolerance: 0.001
     Swipes: []
+  - Name: ToggleInventory
+    AlwaysProcess: 0
+    Keys: 69000000
+    Axes: []
+    Swipes: []

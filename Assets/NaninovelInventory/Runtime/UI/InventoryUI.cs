@@ -31,25 +31,7 @@ namespace NaninovelInventory
         [SerializeField] private RectTransform content = default;
 
         private InventoryManager inventoryManager;
-
-        public override async UniTask InitializeAsync ()
-        {
-            // Invoked when the UI is initialized by UI manager service.
-
-            await base.InitializeAsync();
-
-            // Store reference to the inventory manager service -- we'll need it later.
-            inventoryManager = Engine.GetService<InventoryManager>();
-
-            // Add the required amount of empty slots to the grid.
-            for (int i = 0; i < capacity; i++)
-            {
-                var slotId = i.ToString(); // using grid cell index as slot identifier
-                var slotProto = grid.SlotPrototype;
-                var slot = new ScriptableGridSlot.Constructor<InventoryGridSlot>(slotProto, slotId, HandleSlotClicked).ConstructedSlot;
-                grid.AddSlot(slot);
-            }
-        }
+        private IInputManager inputManager;
 
         /// <summary>
         /// Returns number of items with the provided ID currently assigned
@@ -210,6 +192,39 @@ namespace NaninovelInventory
         {
             base.Awake();
             this.AssertRequiredObjects(grid, content); // make sure the required objects are assigned in the inspector
+
+            // Store reference to the engine services -- we'll need them later.
+            inventoryManager = Engine.GetService<InventoryManager>();
+            inputManager = Engine.GetService<IInputManager>();
+
+            // Add the required amount of empty slots to the grid.
+            for (int i = 0; i < capacity; i++)
+            {
+                var slotId = i.ToString(); // using grid cell index as slot identifier
+                var slotProto = grid.SlotPrototype;
+                var slot = new ScriptableGridSlot.Constructor<InventoryGridSlot>(slotProto, slotId, HandleSlotClicked).ConstructedSlot;
+                grid.AddSlot(slot);
+            }
+        }
+
+        protected override void OnEnable ()
+        {
+            base.OnEnable();
+
+            // Start listening for `ToggleInventory` input event to toggle UI's visibility.
+            var toggleSampler = inputManager.GetSampler("ToggleInventory");
+            if (toggleSampler != null)
+                toggleSampler.OnStart += ToggleVisibility;
+        }
+
+        protected override void OnDisable ()
+        {
+            base.OnDisable();
+
+            // Stop listening for `ToggleInventory` input event.
+            var toggleSampler = inputManager?.GetSampler("ToggleInventory");
+            if (toggleSampler != null)
+                toggleSampler.OnStart -= ToggleVisibility;
         }
 
         protected virtual void HandleSlotClicked (string id)
