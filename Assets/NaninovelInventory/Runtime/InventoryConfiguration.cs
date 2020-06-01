@@ -16,7 +16,5 @@ namespace NaninovelInventory
 
         [Tooltip("Configuration of the resource loader used with inventory resources.")]
         public ResourceLoaderConfiguration Loader = new ResourceLoaderConfiguration { PathPrefix = DefaultPathPrefix };
-        [Tooltip("Whether to allow moving items over the inventory UI by drag-droping them.")]
-        public bool AllowDragDrop = true;
     }
 }
