@@ -36,7 +36,7 @@ Each item has a `Stack Count Limit` property to limit how much items of this typ
 
 You can add items to the inventory with `@addItem` command and remove with `@removeItem` (or `@removeItemAt`, `@removeAllItems`). Item IDs are equal to the item prefab names. Inventory slot IDs are equal to the grid slot indexes (eg, first slot is 0, second is 1, etc).
 
-`ItemExist()` and `ItemCount()` custom [expression functions](https://naninovel.com/guide/script-expressions.md#expression-functions) to check wither an items exist in inventory and number of existing items are also available for convenience.
+`ItemExist()` and `ItemCount()` custom [expression functions](https://naninovel.com/guide/script-expressions.html#expression-functions) to check wither an items exist in inventory and number of existing items are also available for convenience.
 
 Below is a script from the example project:
 
