@@ -7,7 +7,8 @@ namespace NaninovelInventory
     /// <summary>
     /// A custom engine service used to manage available inventory items.
     /// </summary>
-    [InitializeAtRuntime] // the attribute makes the service auto-initialize with other built-in engine services
+    [InitializeAtRuntime] // makes the service auto-initialize with other built-in engine services
+    [Naninovel.Commands.Goto.DontReset] // skips the service reset on @goto commands (to preserve the inventory when navigating scripts)
     public class InventoryManager : IEngineService<InventoryConfiguration>
     {
         public InventoryConfiguration Configuration { get; }
