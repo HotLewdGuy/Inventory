@@ -5,24 +5,14 @@ using UniRx.Async;
 
 namespace NaninovelInventory
 {
-    /// <summary>
-    /// Adds item with the specified identifier to the inventory.
-    /// When slot ID is provided, will assign item to the slot; otherwise will attempt to use first empty slot.
-    /// </summary>
+    [Documentation("Adds item with the specified identifier to the inventory. When slot ID is provided, will assign item to the slot; otherwise will attempt to use first empty slot.")]
     public class AddItem : Command
     {
-        /// <summary>
-        /// Identifier of the item to add.
-        /// </summary>
-        [RequiredParameter, ParameterAlias(NamelessParameterAlias)]
+        [RequiredParameter, ParameterAlias(NamelessParameterAlias), Documentation("Identifier of the item to add.")]
         public StringParameter ItemId;
-        /// <summary>
-        /// Identifier of the slot for which to assign the item.
-        /// </summary>
+        [Documentation("Identifier of the slot for which to assign the item.")]
         public StringParameter SlotId;
-        /// <summary>
-        /// Number of items to add.
-        /// </summary>
+        [Documentation("Number of items to add.")]
         public IntegerParameter Amount = 1;
 
         public override async UniTask ExecuteAsync (CancellationToken cancellationToken = default)

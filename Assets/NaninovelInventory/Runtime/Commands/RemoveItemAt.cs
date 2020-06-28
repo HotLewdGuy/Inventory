@@ -5,19 +5,12 @@ using UniRx.Async;
 
 namespace NaninovelInventory
 {
-    /// <summary>
-    /// Removes item from an inventory slot with the specified identifier.
-    /// </summary>
+    [Documentation("Removes item from an inventory slot with the specified identifier.")]
     public class RemoveItemAt : Command
     {
-        /// <summary>
-        /// Identifier of inventory slot to remove item from.
-        /// </summary>
-        [RequiredParameter, ParameterAlias(NamelessParameterAlias)]
+        [RequiredParameter, ParameterAlias(NamelessParameterAlias), Documentation("Identifier of inventory slot to remove item from.")]
         public StringParameter SlotId;
-        /// <summary>
-        /// Number of items to remove.
-        /// </summary>
+        [Documentation("Number of items to remove.")]
         public IntegerParameter Amount = 1;
 
         public override UniTask ExecuteAsync (CancellationToken cancellationToken = default)

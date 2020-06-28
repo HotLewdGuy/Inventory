@@ -5,15 +5,10 @@ using UniRx.Async;
 
 namespace NaninovelInventory
 {
-    /// <summary>
-    /// Uses item with the specified identifier (in case it's exist in the inventory).
-    /// </summary>
+    [Documentation("Uses item with the specified identifier (in case it's exist in the inventory).")]
     public class UseItem : Command
     {
-        /// <summary>
-        /// Identifier of the item to use.
-        /// </summary>
-        [RequiredParameter, ParameterAlias(NamelessParameterAlias)]
+        [RequiredParameter, ParameterAlias(NamelessParameterAlias), Documentation("Identifier of the item to use.")]
         public StringParameter ItemId;
 
         public override UniTask ExecuteAsync (CancellationToken cancellationToken = default)

@@ -5,9 +5,7 @@ using UniRx.Async;
 
 namespace NaninovelInventory
 {
-    /// <summary>
-    /// Removes all item in the inventory.
-    /// </summary>
+    [Documentation("Removes all item in the inventory.")]
     public class RemoveAllItems : Command
     {
         public override UniTask ExecuteAsync (CancellationToken cancellationToken = default)
