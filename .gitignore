@@ -4,6 +4,7 @@
 /[Bb]uild/
 /[Bb]uilds/
 .gradle*
+/.idea/
 /Assets/AssetStoreTools*
 /Assets/StreamingAssets*
 /Assets/ThirdParty/Naninovel*
