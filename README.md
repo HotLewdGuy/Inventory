@@ -16,6 +16,8 @@ To setup inventory extension on top of an existing Unity project use [UPM](https
 
 ![](https://i.gyazo.com/b54e9daa9a483d9bf7f74f0e94b2d38a.gif)
 
+After importing the package, add `NaninovelInventory` to the `Type Namespaces` list property found in the engine configuration menu.
+
 ## Usage
 
 To create a pre-made inventory UI from template, use `Create -> Naninovel -> Inventory -> Inventory UI` asset context menu. Then add the prefab to the Naninovel UI resources via `Naninovel -> Resources -> UI` editor menu. Once added, the UI can be shown/hidden like all the other UIs with `@showUI` and `@hideUI` commands.
