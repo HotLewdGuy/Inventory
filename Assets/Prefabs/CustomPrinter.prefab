@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 114653316575572746}
   - component: {fileID: 114172372010645744}
   m_Layer: 5
-  m_Name: CustomDialoguePrinter
+  m_Name: CustomPrinter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -87,8 +87,15 @@ MonoBehaviour:
   onHide:
     m_PersistentCalls:
       m_Calls: []
+  hideOnLoad: 1
+  saveVisibilityState: 1
+  blockInputWhenVisible: 0
+  allowedSamplers: []
+  modalUI: 0
+  fontChangeConfiguration: []
   content: {fileID: 7466899038394840338}
-  continueInputTrigger: {fileID: 1560104929271160}
+  continueInputTriggers:
+  - {fileID: 1560104929271160}
   authorNamePanel: {fileID: 6695179159936184171}
   authorAvatarImage: {fileID: 0}
   inputIndicator: {fileID: 114522303404012452, guid: b9b3fefeea6c9f74ca0e1a2f9e4dfb13,

@@ -6,7 +6,7 @@ namespace NaninovelInventory
     /// <summary>
     /// Contains configuration data for the inventory-related systems.
     /// </summary>
-    [System.Serializable]
+    [EditInProjectSettings]
     public class InventoryConfiguration : Configuration
     {
         /// <summary>
