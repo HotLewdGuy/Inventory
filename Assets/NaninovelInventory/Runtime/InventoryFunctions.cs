@@ -9,7 +9,7 @@ namespace NaninovelInventory
         {
             var uiManager = Engine.GetService<IUIManager>();
             var inventory = uiManager.GetUI<InventoryUI>();
-            return inventory.ItemCount(itemId);
+            return inventory.CountItem(itemId);
         }
 
         public static bool ItemExist (string itemId) => ItemCount(itemId) > 0;

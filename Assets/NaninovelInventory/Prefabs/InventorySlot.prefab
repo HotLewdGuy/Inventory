@@ -147,6 +147,9 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   hoverOpacityFade: 0.25
+  onSlotClicked:
+    m_PersistentCalls:
+      m_Calls: []
   stackCountText: {fileID: 9187808289632115302}
 --- !u!225 &225492186654018154
 CanvasGroup:

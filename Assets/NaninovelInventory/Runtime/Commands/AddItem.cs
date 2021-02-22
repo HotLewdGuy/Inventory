@@ -1,5 +1,4 @@
 ﻿using Naninovel;
-using Naninovel.Commands;
 using UniRx.Async;
 
 namespace NaninovelInventory
@@ -10,7 +9,7 @@ namespace NaninovelInventory
         [RequiredParameter, ParameterAlias(NamelessParameterAlias), Documentation("Identifier of the item to add.")]
         public StringParameter ItemId;
         [Documentation("Identifier of the slot for which to assign the item.")]
-        public StringParameter SlotId;
+        public IntegerParameter SlotId;
         [Documentation("Number of items to add.")]
         public IntegerParameter Amount = 1;
 

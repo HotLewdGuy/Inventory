@@ -1,7 +1,8 @@
-﻿using Naninovel;
-using Naninovel.UI;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Naninovel;
+using Naninovel.UI;
 using UniRx.Async;
 using UnityEngine;
 
@@ -14,13 +15,13 @@ namespace NaninovelInventory
     {
         /// <summary>
         /// Represents serializable inventory state.
-        /// More info about using custom state in Nainovel: https://naninovel.com/guide/state-management.html#custom-state
+        /// More info about using custom state in Naninovel: https://naninovel.com/guide/state-management.html#custom-state
         /// </summary>
-        [System.Serializable]
+        [Serializable]
         private new class GameState
         {
             public Vector3 Position;
-            public List<InventorySlotState> OccupiedSlots;
+            public InventorySlot.State[] Slots;
         }
 
         [Tooltip("Number of slots the inventory has.")]
@@ -38,7 +39,7 @@ namespace NaninovelInventory
         /// to the inventory slots.
         /// </summary>
         /// <param name="itemId">Identifier of the item to count.</param>
-        public int ItemCount (string itemId) => grid.GetAllSlots().Sum(s => s.ItemAssigned && s.Item.Id == itemId ? s.StackCount : 0);
+        public int CountItem (string itemId) => grid.InventorySlots.Sum(s => !s.Empty && s.Item.Id == itemId ? s.StackCount : 0);
 
         /// <summary>
         /// Attempts to add an item with the provided <paramref name="itemId"/> to the first 
@@ -50,59 +51,63 @@ namespace NaninovelInventory
         public async UniTask<bool> AddItemAsync (string itemId, int amount = 1)
         {
             // Check if we can stack the items.
-            var stackSlot = grid.FindSlot(s => s.ItemAssigned && s.Item.Id == itemId && s.Item.StackCountLimit >= (s.StackCount + amount));
-            if (ObjectUtils.IsValid(stackSlot))
-                return await AddItemAtAsync(itemId, stackSlot.Id, amount);
+            var stackSlotIndex = grid.InventorySlots.IndexOf(CanStack);
+            if (stackSlotIndex >= 0) return await AddItemAtAsync(itemId, stackSlotIndex, amount);
 
             // In case can't stack, find first empty slot.
-            var emptySlot = grid.FindSlot(s => !s.ItemAssigned);
-            if (!ObjectUtils.IsValid(emptySlot))
+            var emptySlotIndex = grid.InventorySlots.IndexOf(s => s.Empty);
+            if (emptySlotIndex < 0)
             {
                 Debug.LogError($"Failed to add `{itemId}`: no empty slots available.");
                 return false;
             }
 
-            return await AddItemAtAsync(itemId, emptySlot.Id, amount);
+            return await AddItemAtAsync(itemId, emptySlotIndex, amount);
+
+            bool CanStack (InventorySlot slot)
+            {
+                if (slot.Empty || slot.Item.Id != itemId) return false;
+                return slot.Item.StackCountLimit >= slot.StackCount + amount;
+            }
         }
 
         /// <summary>
         /// Attempts to add an item with the provided <paramref name="itemId"/> to an inventory 
-        /// slot with the provided <paramref name="slotId"/>.
+        /// slot with the provided <paramref name="slotIndex"/>.
         /// </summary>
         /// <param name="itemId">Identifier of the item to add.</param>
-        /// <param name="slotId">Identifier of an inventory slot to put the item into.</param>
+        /// <param name="slotIndex">Index of the inventory slot to put the item into.</param>
         /// <param name="amount">Number of items to add.</param>
         /// <returns>Whether the item(s) were added.</returns>
-        public async UniTask<bool> AddItemAtAsync (string itemId, string slotId, int amount = 1)
+        public async UniTask<bool> AddItemAtAsync (string itemId, int slotIndex, int amount = 1)
         {
-            var slot = grid.GetSlot(slotId);
-            if (!ObjectUtils.IsValid(slot))
+            if (!grid.InventorySlots.IsIndexValid(slotIndex))
             {
-                Debug.LogError($"Failed to add `{itemId}` to `{slotId}` slot: slot with the provided ID doesn't exist.");
+                Debug.LogError($"Failed to add `{itemId}` to `{slotIndex}` slot: slot with the provided ID doesn't exist.");
                 return false;
             }
+            var slot = grid.InventorySlots[slotIndex];
 
             var item = await inventoryManager.GetItemAsync(itemId);
             if (!ObjectUtils.IsValid(item))
             {
-                Debug.LogError($"Failed to add `{itemId}` to `{slotId}` slot: item with the provided ID doesn't exist.");
+                Debug.LogError($"Failed to add `{itemId}` to `{slot}` slot: item with the provided ID doesn't exist.");
                 return false;
             }
 
-            if (slot.ItemAssigned && slot.Item.Id != itemId)
+            if (!slot.Empty && slot.Item.Id != itemId)
             {
-                Debug.LogError($"Failed to add `{itemId}` to `{slotId}` slot: slot is already occupied with `{slot.Item.Id}` item.");
+                Debug.LogError($"Failed to add `{itemId}` to `{slot}` slot: slot is already occupied with `{slot.Item.Id}` item.");
                 return false;
             }
 
-            if (slot.ItemAssigned && (slot.StackCount + amount) > item.StackCountLimit)
+            if (!slot.Empty && slot.StackCount + amount > item.StackCountLimit)
             {
-                Debug.LogError($"Failed to add `{itemId}` (x{amount}) to `{slotId}` slot: exceeding stack count limit.");
+                Debug.LogError($"Failed to add `{itemId}` (x{amount}) to `{slot}` slot: exceeding stack count limit.");
                 return false;
             }
 
-            if (!slot.ItemAssigned)
-                slot.AssignItem(item);
+            if (slot.Empty) slot.SetItem(item);
             slot.SetStackCount(slot.StackCount + amount);
 
             return true;
@@ -118,8 +123,8 @@ namespace NaninovelInventory
         {
             while (amount > 0)
             {
-                var slot = grid.FindSlot(s => s.ItemAssigned && s.Item.Id == itemId);
-                if (!ObjectUtils.IsValid(slot))
+                var slot = grid.InventorySlots.FirstOrDefault(s => !s.Empty && s.Item.Id == itemId);
+                if (slot is null)
                 {
                     Debug.LogError($"Failed to remove `{itemId}` item (x{amount}): item is not added to the inventory or not enough stacks.");
                     return false;
@@ -133,41 +138,45 @@ namespace NaninovelInventory
         }
 
         /// <summary>
-        /// Attempts to remove an item from an inventory slot with the provided <paramref name="slotId"/>.
+        /// Attempts to remove an item from an inventory slot with the provided <paramref name="slotIndex"/>.
         /// </summary>
-        /// <param name="slotId">Identifier of the inventory slot to remove item from.</param>
+        /// <param name="slotIndex">Index of the inventory slot to remove item from.</param>
         /// <param name="amount">Number of items to remove.</param>
         /// <returns>Whether the item was removed.</returns>
-        public bool RemoveItemAt (string slotId, int amount = 1)
+        public bool RemoveItemAt (int slotIndex, int amount = 1)
         {
-            var slot = grid.GetSlot(slotId);
-            if (!ObjectUtils.IsValid(slot))
+            if (!grid.InventorySlots.IsIndexValid(slotIndex))
             {
-                Debug.LogError($"Failed to remove an item from `{slotId}` slot: slot with the provided ID doesn't exist.");
+                Debug.LogError($"Failed to remove an item from `{slotIndex}` slot: slot with the provided ID doesn't exist.");
                 return false;
             }
+            var slot = grid.InventorySlots[slotIndex];
 
-            if (!slot.ItemAssigned)
+            if (slot.Empty)
             {
-                Debug.LogError($"Failed to remove an item from `{slotId}` slot: no item is assigned to the slot.");
+                Debug.LogError($"Failed to remove an item from `{slotIndex}` slot: no item is assigned to the slot.");
                 return false;
             }
 
             if (slot.StackCount < amount)
             {
-                Debug.LogError($"Failed to remove `{slot.Item.Id}` item (x{amount}) from `{slotId}` slot: not enough stacks.");
+                Debug.LogError($"Failed to remove `{slot.Item.Id}` item (x{amount}) from `{slotIndex}` slot: not enough stacks.");
                 return false;
             }
 
             slot.SetStackCount(slot.StackCount - amount);
-            if (slot.StackCount == 0) slot.RemoveItem();
+            if (slot.StackCount == 0) slot.SetItem(null);
             return true;
         }
 
         /// <summary>
         /// Removes all the items assigned to inventory slots.
         /// </summary>
-        public void RemoveAllItems () => grid.GetAllSlots().ForEach(s => s.RemoveItem());
+        public void RemoveAllItems ()
+        {
+            foreach (var slot in grid.InventorySlots)
+                slot.SetEmpty();
+        }
 
         /// <summary>
         /// Attempts to use an item with the provided <paramref name="itemId"/>.
@@ -176,8 +185,8 @@ namespace NaninovelInventory
         /// <returns>Whether the item was found and used.</returns>
         public bool UseItem (string itemId)
         {
-            var slot = grid.FindSlot(s => s.ItemAssigned && s.Item.Id == itemId);
-            if (!ObjectUtils.IsValid(slot))
+            var slot = grid.InventorySlots.FirstOrDefault(s => !s.Empty && s.Item.Id == itemId);
+            if (slot is null)
             {
                 Debug.LogError($"Failed to use `{itemId}` item: item doesn't exist in inventory.");
                 return false;
@@ -186,6 +195,19 @@ namespace NaninovelInventory
             slot.Item.Use(slot.Id);
 
             return true;
+        }
+
+        /// <summary>
+        /// Attempts to use an item with the provided <paramref name="slotIndex"/>.
+        /// </summary>
+        public virtual void UseItemAtSlot (int slotIndex)
+        {
+            if (!grid.InventorySlots.IsIndexValid(slotIndex)) return;
+
+            var slot = grid.InventorySlots[slotIndex];
+            if (slot.Empty) return;
+
+            slot.Item.Use(slotIndex);
         }
 
         protected override void Awake ()
@@ -197,14 +219,8 @@ namespace NaninovelInventory
             inventoryManager = Engine.GetService<InventoryManager>();
             inputManager = Engine.GetService<IInputManager>();
 
-            // Add the required amount of empty slots to the grid.
-            for (int i = 0; i < capacity; i++)
-            {
-                var slotId = i.ToString(); // using grid cell index as slot identifier
-                var slotProto = grid.SlotPrototype;
-                var slot = new ScriptableGridSlot.Constructor<InventoryGridSlot>(slotProto, slotId, HandleSlotClicked).ConstructedSlot;
-                grid.AddSlot(slot);
-            }
+            grid.Initialize(capacity);
+            grid.OnSlotClicked += UseItemAtSlot;
         }
 
         protected override void OnEnable ()
@@ -227,14 +243,6 @@ namespace NaninovelInventory
                 toggleSampler.OnStart -= ToggleVisibility;
         }
 
-        protected virtual void HandleSlotClicked (string id)
-        {
-            var slot = grid.GetSlot(id);
-            if (!slot.ItemAssigned) return;
-
-            slot.Item.Use(id);
-        }
-
         protected override void SerializeState (GameStateMap stateMap)
         {
             // Invoked when the game is saved.
@@ -242,12 +250,9 @@ namespace NaninovelInventory
             base.SerializeState(stateMap);
 
             // Serialize UI state.
-            var state = new GameState() {
+            var state = new GameState {
                 Position = content.transform.position,
-                OccupiedSlots = grid.GetAllSlots()                                      // get all slots in the inventory
-                    .Where(s => s.ItemAssigned)                                         // filter-out empty slots
-                    .Select(s => new InventorySlotState(s.Id, s.Item.Id, s.StackCount)) // create state structs for non-empty slots
-                    .ToList()                                                           // create list collection from the query result
+                Slots = grid.InventorySlots.Select(s => s.GetSate()).ToArray()
             };
             stateMap.SetState(state);
         }
@@ -264,9 +269,12 @@ namespace NaninovelInventory
             if (state is null) return; // empty state, do nothing
 
             // Restore UI state.
-            if (state.OccupiedSlots?.Count > 0)
+            if (state.Slots?.Length > 0)
             {
-                var tasks = state.OccupiedSlots.Select(s => AddItemAtAsync(s.ItemId, s.SlotId, s.StackCount));
+                var tasks = new List<UniTask>();
+                for (int i = 0; i < state.Slots.Length; i++)
+                    if (!string.IsNullOrEmpty(state.Slots[i].ItemId))
+                        tasks.Add(AddItemAtAsync(state.Slots[i].ItemId, i, state.Slots[i].StackCount));
                 await UniTask.WhenAll(tasks);
             }
             content.transform.position = state.Position;

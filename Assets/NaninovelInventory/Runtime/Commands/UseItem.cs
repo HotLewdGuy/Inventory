@@ -1,5 +1,4 @@
 ﻿using Naninovel;
-using Naninovel.Commands;
 using UniRx.Async;
 
 namespace NaninovelInventory

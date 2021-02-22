@@ -5,75 +5,64 @@ using UnityEngine.UI;
 namespace NaninovelInventory
 {
     /// <summary>
-    /// Applied to the root of inventory slot prefab.
+    /// Attached to the root of inventory slot prefab.
     /// </summary>
     public class InventoryGridSlot : ScriptableGridSlot
     {
-        /// <summary>
-        /// Item that is currently assigned to the slot.
-        /// </summary>
-        public InventoryItem Item { get; private set; }
-        /// <summary>
-        /// Whether an item is currently assigned to the slot.
-        /// </summary>
-        public bool ItemAssigned => ObjectUtils.IsValid(Item);
-        /// <summary>
-        /// Number of <see cref="Item"/> assigned to the slot.
-        /// </summary>
-        public int StackCount { get; private set; }
+        public override string Id => BindSlot?.Id.ToString();
+        public InventorySlot BindSlot { get; private set; }
 
         [Tooltip("Text to show current stack count of the item (if the slot is occupied).")]
         [SerializeField] private Text stackCountText = default;
 
-        /// <summary>
-        /// Assigns provided <paramref name="item"/> to the slot.
-        /// </summary>
-        /// <param name="item">The item to assign.</param>
-        public void AssignItem (InventoryItem item)
+        private InventoryItem item;
+
+        public void Bind (InventorySlot inventorySlot)
         {
-            if (ItemAssigned)
+            if (BindSlot != null)
             {
-                Debug.LogError($"Failed to assign `{item.Id}` item to `{Id}` slot: `{item.Id}` item is already assigned to this slot.");
-                return;
+                BindSlot.OnItemChanged -= SetItem;
+                BindSlot.OnStackCountChanged -= SetStackCount;
             }
 
-            Item = Instantiate(item);
-            Item.name = item.Id;
+            BindSlot = inventorySlot;
+            BindSlot.OnItemChanged += SetItem;
+            BindSlot.OnStackCountChanged += SetStackCount;
 
-            Item.transform.SetParent(transform, false);
-            Item.transform.SetAsFirstSibling(); // this will make stack count text render on top of the item
-        }
-
-        /// <summary>
-        /// Un-assigns currently assigned item.
-        /// </summary>
-        public void RemoveItem ()
-        {
-            if (ItemAssigned)
-            {
-                ObjectUtils.DestroyOrImmediate(Item.gameObject);
-                Item = null;
-            }
-            SetStackCount(0);
-        }
-
-        /// <summary>
-        /// Modifies <see cref="StackCount"/>.
-        /// </summary>
-        public void SetStackCount (int count)
-        {
-            StackCount = count;
-
-            stackCountText.text = count.ToString();
-            stackCountText.gameObject.SetActive(count > 1);
+            SetItem(inventorySlot.Item);
+            SetStackCount(inventorySlot.StackCount);
         }
 
         protected override void Awake ()
         {
             base.Awake();
             this.AssertRequiredObjects(stackCountText); // make sure required objects are assigned in the inspector
-
             stackCountText.gameObject.SetActive(false); // initially hide the stack count text
+        }
+
+        private void SetItem (InventoryItem prototype)
+        {
+            if (ObjectUtils.IsValid(prototype))
+            {
+                // Note that this naive implementation is just for example.
+                // In real projects use object pool instead of instantiating and destroying the items.
+                if (item) ObjectUtils.DestroyOrImmediate(item.gameObject);
+                item = Instantiate(prototype, transform, false);
+                item.transform.SetAsFirstSibling(); // this will make stack count text render on top of the item
+            }
+            else SetEmpty();
+        }
+
+        private void SetStackCount (int count)
+        {
+            stackCountText.text = count.ToString();
+            stackCountText.gameObject.SetActive(count > 1);
+        }
+
+        private void SetEmpty ()
+        {
+            if (item) ObjectUtils.DestroyOrImmediate(item.gameObject);
+            SetStackCount(0);
         }
     }
 }

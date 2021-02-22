@@ -1,5 +1,4 @@
 ﻿using Naninovel;
-using Naninovel.Commands;
 using UniRx.Async;
 
 namespace NaninovelInventory
@@ -8,7 +7,7 @@ namespace NaninovelInventory
     public class RemoveItemAt : Command
     {
         [RequiredParameter, ParameterAlias(NamelessParameterAlias), Documentation("Identifier of inventory slot to remove item from.")]
-        public StringParameter SlotId;
+        public IntegerParameter SlotId;
         [Documentation("Number of items to remove.")]
         public IntegerParameter Amount = 1;
 
