@@ -26,7 +26,7 @@ namespace NaninovelInventory
 
         protected override void InitializeSlot (InventoryGridSlot gridSlot)
         {
-            gridSlot.OnButtonClicked += () => OnSlotClicked?.Invoke(gridSlot.BindSlot?.Id ?? -1);
+            gridSlot.OnButtonClicked += () => OnSlotClicked?.Invoke(gridSlot.BoundSlot?.Id ?? -1);
         }
 
         protected override void BindSlot (InventoryGridSlot gridSlot, int itemIndex)

@@ -1,43 +1,48 @@
 ﻿using Naninovel;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace NaninovelInventory
 {
     /// <summary>
-    /// Attached to the root of inventory slot prefab.
+    /// Attached to the root object of inventory slot UI prefab.
     /// </summary>
     public class InventoryGridSlot : ScriptableGridSlot
     {
-        public override string Id => BindSlot?.Id.ToString();
-        public InventorySlot BindSlot { get; private set; }
+        /// <summary>
+        /// Current slot model bound to the UI.
+        /// </summary>
+        public InventorySlot BoundSlot { get; private set; }
+        public override string Id => BoundSlot?.Id.ToString();
 
-        [Tooltip("Text to show current stack count of the item (if the slot is occupied).")]
-        [SerializeField] private Text stackCountText = default;
+        // Unity event invoked when stack count text is changed.
+        [SerializeField] private StringUnityEvent onStackCountChanged = default;
 
+        // Instance of the currently assigned item contained inside the slot UI.
         private InventoryItem item;
-
+        
         public void Bind (InventorySlot inventorySlot)
         {
-            if (BindSlot != null)
+            // For performance reasons, instead of spawning UIs for all the slots in the grid,
+            // we spawn only the slots visible to the player and change their state
+            // according to the bound slot model and selected grid page.
+            
+            // Unsubscribe from the events of the previously bound model.
+            if (BoundSlot != null)
             {
-                BindSlot.OnItemChanged -= SetItem;
-                BindSlot.OnStackCountChanged -= SetStackCount;
+                BoundSlot.OnItemChanged -= SetItem;
+                BoundSlot.OnStackCountChanged -= SetStackCount;
             }
 
-            BindSlot = inventorySlot;
-            BindSlot.OnItemChanged += SetItem;
-            BindSlot.OnStackCountChanged += SetStackCount;
+            // Store reference to the new slot model.
+            BoundSlot = inventorySlot;
+            
+            // Receive updates when bound slot model is modified.
+            BoundSlot.OnItemChanged += SetItem;
+            BoundSlot.OnStackCountChanged += SetStackCount;
 
+            // Update UI state for the new slot model.
             SetItem(inventorySlot.Item);
             SetStackCount(inventorySlot.StackCount);
-        }
-
-        protected override void Awake ()
-        {
-            base.Awake();
-            this.AssertRequiredObjects(stackCountText); // make sure required objects are assigned in the inspector
-            stackCountText.gameObject.SetActive(false); // initially hide the stack count text
         }
 
         private void SetItem (InventoryItem prototype)
@@ -55,8 +60,8 @@ namespace NaninovelInventory
 
         private void SetStackCount (int count)
         {
-            stackCountText.text = count.ToString();
-            stackCountText.gameObject.SetActive(count > 1);
+            var text = count <= 1 ? string.Empty : count.ToString();
+            onStackCountChanged?.Invoke(text);
         }
 
         private void SetEmpty ()

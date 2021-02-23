@@ -120,5 +120,8 @@ MonoBehaviour:
 
     @spawn DigitalGlitch wait:false
 
-    Wow...
-    Was it a good idea eating this?'
+    @toast
+    "-{Random(5, 25)} MORALE" appearance:error
+
+    Wow... Was it a good idea eating
+    this?'

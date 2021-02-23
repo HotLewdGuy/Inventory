@@ -116,5 +116,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scriptName: 
-  scriptText: A sharp sword with a fancy velvet handle. It's stored in slot {{arg}+1}
-    of my bag. Don't forget to polish it properly!
+  scriptText: '@toast "+1 MORALE" if:Random(0,2)>1
+
+    A sharp sword with a fancy
+    velvet handle. It''s stored in slot {{arg}+1} of my bag. Don''t forget to polish
+    it properly!'

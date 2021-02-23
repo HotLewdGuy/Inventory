@@ -4,8 +4,8 @@
 
 Select an action.[skipInput]
 
-@choice "Pick up sword" if:!ItemExist("Sword") do:"@addItem Sword, @goto .Adventure"
-@choice "Pick up armor" if:!ItemExist("Armor") do:"@addItem Armor, @goto .Adventure"
+@choice "Pick up sword" if:!ItemExist("Sword") do:"@addItem Sword, @toast \"+50 MORALE\", @goto .Adventure"
+@choice "Pick up armor" if:!ItemExist("Armor") do:"@addItem Armor, @toast \"+25 MORALE\",  @goto .Adventure"
 @choice "Adventure awaits, venture forth!"
 @stop
 
