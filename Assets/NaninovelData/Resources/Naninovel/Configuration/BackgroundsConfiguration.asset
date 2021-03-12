@@ -27,12 +27,19 @@ MonoBehaviour:
         Culture=neutral, PublicKeyToken=null
       - Naninovel.ProjectResourceProvider, Elringus.Naninovel.Runtime, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
-    guid: e5079695-7cda-487f-a1cc-a5683fa73bec
+    guid: 6eddd3fa-1a25-4fc7-85a7-c36ce3bbec84
+    customData:
+      id: 0
     Pivot: {x: 0.5, y: 0.5}
     PixelsPerUnit: 100
     EnableDepthPass: 1
     DepthAlphaCutoff: 0.5
-    CustomShader: {fileID: 0}
+    CustomTextureShader: {fileID: 0}
+    CustomSpriteShader: {fileID: 0}
+    RenderTexture: {fileID: 0}
+    CorrectRenderAspect: 1
+    MatchMode: 0
+    CustomMatchRatio: 0
     Poses: []
   Metadata:
     ids:
@@ -47,10 +54,21 @@ MonoBehaviour:
           Culture=neutral, PublicKeyToken=null
         - Naninovel.ProjectResourceProvider, Elringus.Naninovel.Runtime, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
-      guid: b29098d9-74a2-4afd-a54c-3ad97be9d4b0
+      guid: 05a4865f-e44b-4d46-ae93-21a7c83ff449
+      customData:
+        id: 0
       Pivot: {x: 0.5, y: 0.5}
       PixelsPerUnit: 100
       EnableDepthPass: 1
       DepthAlphaCutoff: 0.5
-      CustomShader: {fileID: 0}
+      CustomTextureShader: {fileID: 0}
+      CustomSpriteShader: {fileID: 0}
+      RenderTexture: {fileID: 0}
+      CorrectRenderAspect: 1
+      MatchMode: 0
+      CustomMatchRatio: 0
       Poses: []
+  references:
+    version: 1
+    00000000:
+      type: {class: , ns: , asm: }

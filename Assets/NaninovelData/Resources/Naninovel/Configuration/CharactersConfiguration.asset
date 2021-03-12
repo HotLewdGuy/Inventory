@@ -18,6 +18,7 @@ MonoBehaviour:
   ZOffset: 50
   ZStep: 0.1
   AutoArrangeOnAdd: 1
+  ArrangeRange: {x: 0, y: 1}
   DefaultMetadata:
     Implementation: Naninovel.SpriteCharacter, Elringus.Naninovel.Runtime, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
@@ -28,12 +29,17 @@ MonoBehaviour:
         Culture=neutral, PublicKeyToken=null
       - Naninovel.ProjectResourceProvider, Elringus.Naninovel.Runtime, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
-    guid: ce876668-6b48-4933-a482-c08170a993c0
+    guid: 3219bbae-5038-4280-9879-5b7aec6b34ef
+    customData:
+      id: 0
     Pivot: {x: 0.5, y: 0}
     PixelsPerUnit: 100
     EnableDepthPass: 1
     DepthAlphaCutoff: 0.5
-    CustomShader: {fileID: 0}
+    CustomTextureShader: {fileID: 0}
+    CustomSpriteShader: {fileID: 0}
+    RenderTexture: {fileID: 0}
+    CorrectRenderAspect: 1
     BakedLookDirection: 1
     DisplayName: 
     UseCharacterColor: 0
@@ -41,13 +47,14 @@ MonoBehaviour:
     MessageColor: {r: 1, g: 1, b: 1, a: 1}
     HighlightWhenSpeaking: 0
     HighlightCharacterCount: 0
-    SpeakingTint: {r: 1, g: 1, b: 1, a: 1}
-    NotSpeakingTint: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    SpeakingPose: 
+    NotSpeakingPose: 
     PlaceOnTop: 1
     HighlightDuration: 0.35
     HighlightEasing: 1
     MessageSound: 
     ClipMessageSound: 1
+    VoiceSource: {fileID: 0}
     LinkedPrinter: 
     Poses: []
   Metadata:
@@ -60,3 +67,7 @@ MonoBehaviour:
       Culture=neutral, PublicKeyToken=null
     - Naninovel.ProjectResourceProvider, Elringus.Naninovel.Runtime, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
+  references:
+    version: 1
+    00000000:
+      type: {class: , ns: , asm: }

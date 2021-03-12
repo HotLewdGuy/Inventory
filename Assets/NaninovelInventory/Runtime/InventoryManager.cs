@@ -1,6 +1,7 @@
-﻿using Naninovel;
-using System.Collections.Generic;
+﻿using System;
+using Naninovel;
 using UniRx.Async;
+using UnityEngine;
 
 namespace NaninovelInventory
 {
@@ -13,14 +14,12 @@ namespace NaninovelInventory
     {
         public InventoryConfiguration Configuration { get; }
 
-        /// <summary>
-        /// Stores (caches) loaded item prefabs in `Item ID -> Item Prefab` map.
-        /// </summary>
-        private readonly Dictionary<string, InventoryItem> loadedItems = new Dictionary<string, InventoryItem>();
         private readonly IResourceProviderManager providersManager;
-        private ResourceLoader<InventoryItem> itemLoader;
+        private readonly ILocalizationManager localizationManager;
+        private LocalizableResourceLoader<GameObject> itemLoader;
 
-        public InventoryManager (InventoryConfiguration config, IResourceProviderManager providersManager)
+        public InventoryManager (InventoryConfiguration config,
+            IResourceProviderManager providersManager, ILocalizationManager localizationManager)
         {
             // Engine service constructors are invoked when the engine is initializing;
             // remember that it's not safe to use other services here, as they are not initialized yet.
@@ -28,6 +27,7 @@ namespace NaninovelInventory
 
             Configuration = config;
             this.providersManager = providersManager; // required to load item prefabs
+            this.localizationManager = localizationManager; // required to load localized versions of item prefabs
         }
 
         public UniTask InitializeServiceAsync ()
@@ -36,7 +36,7 @@ namespace NaninovelInventory
             // it's safe to use the required services here (IResourceProviderManager in this case).
 
             // Initialize item prefab loader, as per the configuration.
-            itemLoader = Configuration.Loader.CreateFor<InventoryItem>(providersManager);
+            itemLoader = Configuration.Loader.CreateLocalizableFor<GameObject>(providersManager, localizationManager);
 
             return UniTask.CompletedTask;
         }
@@ -49,16 +49,14 @@ namespace NaninovelInventory
             if (ObjectUtils.IsValid(inventory))
                 inventory.RemoveAllItems(); // remove all items from the current inventory
 
-            itemLoader?.UnloadAll(); // unload item prefabs to free memory
-            loadedItems.Clear(); // clear cached items
+            itemLoader?.ReleaseAll(this); // unload item prefabs to free memory
         }
 
         public void DestroyService ()
         {
             // Invoked when destroying the engine.
 
-            itemLoader?.UnloadAll();
-            loadedItems.Clear();
+            itemLoader?.ReleaseAll(this);
         }
 
         /// <summary>
@@ -66,23 +64,10 @@ namespace NaninovelInventory
         /// </summary>
         public async UniTask<InventoryItem> GetItemAsync (string itemId)
         {
-            // If item prefab is already loaded, return it.
-            if (loadedItems.TryGetValue(itemId, out var item))
-                return item;
-
-            // Attempt to load the required item.
-            item = await itemLoader.LoadAsync(itemId);
-
-            // If failed to load the item, return null.
-            if (!ObjectUtils.IsValid(item)) return null;
-
-            // Make sure item name is equal to the requested ID.
-            item.name = itemId;
-
-            // Cache the loaded item prefab in the map by its ID.
-            loadedItems[itemId] = item;
-
-            return item;
+            // If item resource is already loaded, get it; otherwise load asynchronously.
+            var itemResource = itemLoader.GetLoadedOrNull(itemId) ?? await itemLoader.LoadAndHoldAsync(itemId, this);
+            if (!itemResource.Valid) throw new Exception($"Failed to load `{itemId}` item resource.");
+            return itemResource.Object.GetComponent<InventoryItem>();
         }
     }
 }

@@ -21,7 +21,7 @@ MonoBehaviour:
   QuickSaveSlotLimit: 18
   BinarySaveFiles: 1
   LoadStartDelay: 0.3
-  ResetOnGoto: 1
+  ResetOnGoto: 0
   EnableStateRollback: 1
   StateRollbackSteps: 1024
   SavedRollbackSteps: 128

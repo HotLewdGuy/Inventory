@@ -17,6 +17,7 @@ MonoBehaviour:
   SpawnInputModule: 1
   CustomInputModule: {fileID: 0}
   TouchFrequencyLimit: 0.1
+  TouchDistanceLimit: 25
   ProcessLegacyBindings: 1
   Bindings:
   - Name: Submit
@@ -39,7 +40,8 @@ MonoBehaviour:
     Swipes:
     - Direction: 2
       FingerCount: 1
-      MinimumSpeed: 2
+      MinimumDistance: 50
+      ActivateOnMove: 0
   - Name: Pause
     AlwaysProcess: 0
     Keys: 0800000051010000
@@ -59,12 +61,20 @@ MonoBehaviour:
     AlwaysProcess: 0
     Keys: 200000004d010000
     Axes: []
-    Swipes: []
+    Swipes:
+    - Direction: 1
+      FingerCount: 1
+      MinimumDistance: 50
+      ActivateOnMove: 0
   - Name: ShowBacklog
     AlwaysProcess: 0
     Keys: 6c0000004f010000
     Axes: []
-    Swipes: []
+    Swipes:
+    - Direction: 0
+      FingerCount: 1
+      MinimumDistance: 50
+      ActivateOnMove: 0
   - Name: Rollback
     AlwaysProcess: 0
     Keys: 4e010000
@@ -75,7 +85,8 @@ MonoBehaviour:
     Swipes:
     - Direction: 3
       FingerCount: 1
-      MinimumSpeed: 2
+      MinimumDistance: 50
+      ActivateOnMove: 0
   - Name: CameraLookX
     AlwaysProcess: 0
     Keys: 
@@ -97,9 +108,4 @@ MonoBehaviour:
     - AxisName: Mouse Y
       TriggerMode: 0
       TriggerTolerance: 0.001
-    Swipes: []
-  - Name: ToggleInventory
-    AlwaysProcess: 0
-    Keys: 69000000
-    Axes: []
     Swipes: []
