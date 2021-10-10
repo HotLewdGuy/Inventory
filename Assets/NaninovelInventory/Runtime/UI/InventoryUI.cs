@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Naninovel;
 using Naninovel.UI;
-using UniRx.Async;
 using UnityEngine;
 
 namespace NaninovelInventory

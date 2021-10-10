@@ -1,5 +1,4 @@
 ﻿using Naninovel;
-using UniRx.Async;
 
 namespace NaninovelInventory
 {
@@ -11,7 +10,7 @@ namespace NaninovelInventory
         [Documentation("Number of items to remove.")]
         public IntegerParameter Amount = 1;
 
-        public override UniTask ExecuteAsync (CancellationToken cancellationToken = default)
+        public override UniTask ExecuteAsync (AsyncToken asyncToken = default)
         {
             var uiManager = Engine.GetService<IUIManager>();
             var inventory = uiManager.GetUI<InventoryUI>();

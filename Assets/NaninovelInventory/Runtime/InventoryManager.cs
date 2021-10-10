@@ -1,6 +1,5 @@
 ﻿using System;
 using Naninovel;
-using UniRx.Async;
 using UnityEngine;
 
 namespace NaninovelInventory
