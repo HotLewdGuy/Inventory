@@ -1,6 +1,6 @@
 # Naninovel Inventory
 
-While an inventory system is a bit out of scope for VN-style games, we had a lot of requests and questions on how to integrate one with [Naninovel](https://naninovel.com). This GitHub project serves as both an example for creating and integrating an inventory with the engine and an extension, which you can easily setup on top of a Naninovel installation.
+While an inventory system is out of scope for visual novels, we had a lot of requests and questions on how to integrate one with [Naninovel](https://naninovel.com). This GitHub project serves as an example for creating and integrating an inventory extension, which you can setup on top of Naninovel installation without modifying the engine source code.
 
 The project shows how to make a custom inventory UI with grid layout, pagination and drag-drop window, add custom engine service and related configuration menu, add input bindings, use state outsourcing, author custom scenario commands and expression functions.
 
