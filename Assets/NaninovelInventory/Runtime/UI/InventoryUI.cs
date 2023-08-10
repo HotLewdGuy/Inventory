@@ -26,9 +26,9 @@ namespace NaninovelInventory
         [Tooltip("Number of slots the inventory has.")]
         [SerializeField] private int capacity = 80;
         [Tooltip("Reference to the inventory grid layout component.")]
-        [SerializeField] private InventoryGrid grid = default;
+        [SerializeField] private InventoryGrid grid;
         [Tooltip("Content of the inventory.")]
-        [SerializeField] private RectTransform content = default;
+        [SerializeField] private RectTransform content;
 
         private InventoryManager inventoryManager;
         private IInputManager inputManager;

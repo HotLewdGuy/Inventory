@@ -179,7 +179,7 @@ MonoBehaviour:
     Resources:
     - name: Custom
       pathPrefix: TextPrinters
-      guid: 17780202a9f6389408109e7c4a21dca3
+      guid: 1b2900e723f0ccf4f8b2f6cb1e753cb3
   - Id: Backgrounds/05a4865f-e44b-4d46-ae93-21a7c83ff449
     Resources:
     - name: Landscape
